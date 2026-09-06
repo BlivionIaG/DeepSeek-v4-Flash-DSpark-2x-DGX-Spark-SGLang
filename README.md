@@ -43,6 +43,21 @@ cp recipe/env/.env.dspark.example recipe/env/.env.dspark
 - NCCL 2.21+
 - The patched image: `docker.io/blivioniag/sglang:dev-v4f-2dgx-v2-patched-v3_patch001` (private — `sudo docker login` required; pulled automatically by `start-tp2.sh`)
 
+## SGLang serve flags
+
+`start-tp2.sh` passes these `sglang serve` flags (per the DeepSeek V4
+README). All three are required for opencode-style agent loops:
+
+| Flag | Why |
+|---|---|
+| `--tool-call-parser deepseekv4` | Parses DeepSeek V4's `<tool_call>...</tool_call>` blocks into OpenAI-format `tool_calls`. Without this, every "tool call" lands as plain text and opencode's loop crashes. (Note: vLLM requires a separate `--enable-auto-tool-choice` flag; SGLang does not.) |
+| `--reasoning-parser deepseek-v4` | Strips `<think>...</think>` from visible output and exposes them via the OpenAI `reasoning` field. Without this, thinking tokens pollute every reply. |
+| `--speculative-algorithm DSPARK` | DSpark speculative decoding. Target + draft share one checkpoint (no separate draft model path); roughly doubles decode tokens/s. |
+
+All three are env-var overridable (`SGLANG_TOOL_CALL_PARSER`,
+`SGLANG_REASONING_PARSER`, `SGLANG_SPECULATIVE_ALGORITHM`); set any to
+`""` to disable. Default values match the upstream DeepSeek README.
+
 ## Image
 
 The patched image = `lmsysorg/sglang:dev-v4f-2dgx-v2` + 2 source-level patches (see `patches/`). Mirror-locked to upstream commit `452239a74f5b31798290f57aeac2645d98a52f44`. Rebuild with `patches/build.sh`.

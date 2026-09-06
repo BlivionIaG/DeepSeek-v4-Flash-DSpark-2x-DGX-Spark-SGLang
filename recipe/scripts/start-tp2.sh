@@ -64,6 +64,12 @@ MEM_FRACTION_STATIC="${SGLANG_MEM_FRACTION_STATIC:-0.85}"
 MAX_RUNNING_REQUESTS="${SGLANG_MAX_RUNNING_REQUESTS:-8}"
 CONTEXT_LENGTH="${SGLANG_CONTEXT_LENGTH:-4096}"
 SERVING_PORT="${SGLANG_SERVING_PORT:-8888}"
+# DeepSeek V4 chat-template features. All three required for opencode-style
+# agent loops. Set any to "" to disable.
+# SGLang CLI: tool-call uses deepseekv4, reasoning uses deepseek-v4.
+TOOL_CALL_PARSER="${SGLANG_TOOL_CALL_PARSER:-deepseekv4}"
+REASONING_PARSER="${SGLANG_REASONING_PARSER:-deepseek-v4}"
+SPECULATIVE_ALGORITHM="${SGLANG_SPECULATIVE_ALGORITHM:-DSPARK}"
 CONTAINER_NAME="sglang-${ROLE}"
 
 # NCCL envs (ConnectX RoCE on both enp1s0f1np1 + enP2p1s0f1np1, dual HCA;
@@ -185,6 +191,9 @@ docker run -d \
     --disable-radix-cache \
     --weight-loader-drop-cache-after-load \
     --trust-remote-code \
+    $([ -n "$TOOL_CALL_PARSER" ]      && echo "--tool-call-parser $TOOL_CALL_PARSER") \
+    $([ -n "$REASONING_PARSER" ]     && echo "--reasoning-parser $REASONING_PARSER") \
+    $([ -n "$SPECULATIVE_ALGORITHM" ] && echo "--speculative-algorithm $SPECULATIVE_ALGORITHM") \
     "${EXTRA_FLAGS[@]}"
 
 echo ">>> $CONTAINER_NAME started. Tail logs with:"
