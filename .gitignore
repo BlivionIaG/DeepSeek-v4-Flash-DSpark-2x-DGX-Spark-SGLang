@@ -1,0 +1,13 @@
+# Editor / OS
+.DS_Store
+*.swp
+*.swo
+*~
+
+# Operator-local env (the .env.dspark is for per-deployment secrets;
+# only the .env.dspark.example is committed)
+.env.dspark
+.env.dspark.local
+
+# Anything in /tmp that an operator might symlink here
+/tmp/

@@ -1,0 +1,11 @@
+--- a/python/sglang/srt/models/deepseek_v4.py
++++ b/python/sglang/srt/models/deepseek_v4.py
+@@ -3757,6 +3757,8 @@
+                             continue
+                         if name not in params_dict and name.startswith("mtp"):
+                             break
++                        if name.startswith("aligner.") or name.startswith("dspark_aligner."):
++                            continue
+                         param = params_dict[name]
+                         weight_loader = param.weight_loader
+                         maybe_executor_submit(
